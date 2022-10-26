@@ -2,72 +2,109 @@ import './css/styles.css';
 import { fetchCountries } from './fetchCountries';
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-// const debounce = require('lodash.debounce');
-// const DEBOUNCE_DELAY = 300;
+import debounce from 'lodash.debounce';
+const DEBOUNCE_DELAY = 300;
 
 const refs = {
   body: document.querySelector('body'),
-  // container: document.querySelector('.country-info'),
-  // searchBox: document.querySelector('#search-box'),
+  searchBox: document.querySelector('#search-form'),
+  container: document.querySelector('.gallery'),
 };
 
-// refs.searchBox.addEventListener(
-//   'input',
-//   debounce(onInputSearch, DEBOUNCE_DELAY)
-// );
+refs.searchBox.addEventListener(
+  'input',
+  debounce(onInputSearch, DEBOUNCE_DELAY)
+);
 
-// function onInputSearch(event) {
-//   event.preventDefault();
+function onInputSearch(event) {
+  event.preventDefault();
 
-//   const inputSearch = event.target.value.trim().toLowerCase();
-//   console.log(inputSearch);
+  const inputSearch = event.target.value.trim().toLowerCase();
+  console.log(inputSearch);
 
-//   if (inputSearch.length === 0) {
-//     return Notify.failure('Enter country');
-//   }
-  
-//   fetchCountries(inputSearch).then(country => {
-//     clearMarkup()
-//     if (country.length === 1) {
-//       renderCountryItem(country);
-//     } else if (country.length >= 2 && country.length <= 10) {
-//       renderCountryList(country);
-//     } else {
-//       Notify.info('Too many matches found. Please enter a more specific name.');
-//     }
-//   }).catch(onFetchError);
-// }
+  if (inputSearch.length === 0) {
+    return Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
 
-// function clearMarkup () {
-//   refs.container.innerHTML = '';
-//   refs.countryList.innerHTML = '';
-// }
+  fetchCountries(inputSearch)
+    .then(hits => {
+      clearMarkup();
+      if (hits) {
+        renderCountryItem(hits);
+      }
+      // else {
+      //   Notify.info(
+      //     'Sorry, there are no images matching your search query. Please try again.'
+      //   );
+      // }
+    })
+    .catch(onFetchError);
+}
 
-// function renderCountryList(country) {
-//   console.log(country);
-//   const markup = country
-//     .map(
-//       ({ name, flags }) =>
-//         `<li class='country-item'>
-//       <img class='flag' src="${flags.svg}" alt="flags" width=30>
-//       <h2 class='country-title'>${name.common}</h2>`
-//     )
-//     .join('');
-//   refs.countryList.innerHTML = markup;
-// }
+function clearMarkup() {
+  refs.container.innerHTML = '';
+}
 
-// function renderCountryItem([{ name, capital, population, flags, languages }]) {
-//   const markupCard = `<div class='country-box'>
-//   <img class='flag' src="${flags.svg}" alt="flags" width=30>
-//       <h2> ${name.official}</h2></div>
-//       <div><p class='country-text'><span class='country-span'>Capital: </span>${capital}</p>
-//       <p class='country-text'><span class='country-span'>Population: </span>${population}</p>      
-//       <p class='country-text'><span class='country-span'>Languages: </span>${Object.values(
-//         languages
-//       ).join(', ')}</p></div>`;
+// function renderCountryItem([
+//   { webformatURL, tags, likes, views, comments, downloads },
+// ]) {
+//   const markupCard = `<div class="photo-card">
+//   <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+//   <div class="info">
+//     <p class="info-item">
+//       <b>Likes ${likes}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Views ${views}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Comments ${comments}</b>
+//     </p>
+//     <p class="info-item">
+//       <b>Downloads ${downloads}</b>
+//     </p>
+//   </div>
+// </div>`;
 //   refs.container.innerHTML = markupCard;
 // }
 
-// function onFetchError(error) {
-//    Notify.failure('Oops, there is no country with that name');
-// }
+function renderCountryItem(hits) {
+  console.log(hits);
+  const markupCard = hits
+    .map(
+      ({
+        webformatURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<div class="photo-card">
+  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+  <div class="info">
+    <p class="info-item">
+      <b>Likes ${likes}</b>
+    </p>
+    <p class="info-item">
+      <b>Views ${views}</b>
+    </p>
+    <p class="info-item">
+      <b>Comments ${comments}</b>
+    </p>
+    <p class="info-item">
+      <b>Downloads ${downloads}</b>
+    </p>
+  </div>
+</div>`
+    )
+    .joiun('');
+  refs.container.innerHTML = markupCard;
+}
+
+function onFetchError(error) {
+  Notify.failure(
+    'Sorry, there are no images matching your search query. Please try again.'
+  );
+}
