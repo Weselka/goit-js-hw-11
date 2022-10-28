@@ -30,6 +30,10 @@ ul {
   padding: 0;
 }
 
+.photo-card {
+  /* width: 30; */
+}
+
 .country-item {
   display: flex;
   margin-bottom: 16px;
