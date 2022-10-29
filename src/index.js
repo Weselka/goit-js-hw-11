@@ -2,21 +2,22 @@ import './css/styles.css';
 import { apiRings } from './js/apiRings';
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import debounce from 'lodash.debounce';
+// import debounce from 'lodash.debounce';
 import markup from './js/templates/markup.hbs';
 
-const DEBOUNCE_DELAY = 3000;
+// const DEBOUNCE_DELAY = 3000;
 
 const refs = {
   body: document.querySelector('body'),
   searchBox: document.querySelector('#search-form'),
   container: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
 };
 
-refs.searchBox.addEventListener(
-  'input',
-  debounce(onInputSearch, DEBOUNCE_DELAY)
-);
+let page = 1;
+
+refs.searchBox.addEventListener('input', onInputSearch);
+refs.loadMore.addEventListener('click', onLoad);
 
 function onInputSearch(event) {
   event.preventDefault();
@@ -36,6 +37,15 @@ function onInputSearch(event) {
     })
     .catch(onFetchError);
 }
+
+// function onLoad() {
+//   page += 1;
+//   apiRings(page, inputSearch)
+//     .then(data => {
+//       refs.container.insertAdjacentHTML('beforeend', markup(data.hits));
+//     })
+//     .catch(onFetchError);
+// }
 
 function clearMarkup() {
   refs.container.innerHTML = '';
