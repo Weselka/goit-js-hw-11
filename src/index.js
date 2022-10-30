@@ -1,11 +1,12 @@
 import './css/styles.css';
 import { apiRings } from './js/apiRings';
-import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-// import debounce from 'lodash.debounce';
+import debounce from 'lodash.debounce';
 import markup from './js/templates/markup.hbs';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
-// const DEBOUNCE_DELAY = 3000;
+const DEBOUNCE_DELAY = 300;
 
 const refs = {
   searchBox: document.querySelector('#search-form'),
@@ -14,12 +15,18 @@ const refs = {
   loadMoreBtn: document.querySelector('.load-more'),
 };
 
-console.log(refs)
+const lightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 let page = 1;
 let inputSearch = '';
 
-refs.searchBox.addEventListener('input', onInputSearch);
+refs.searchBox.addEventListener(
+  'input',
+  debounce(onInputSearch, DEBOUNCE_DELAY)
+);
 refs.searchBox.addEventListener('click', onClickSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 refs.searchBox.addEventListener('submit', onSubmitSearch);
@@ -30,56 +37,56 @@ refs.searchBtn.disabled = true;
 function onInputSearch(event) {
   event.preventDefault();
   clearMarkup();
-  
+
   inputSearch = event.target.value;
   console.log(inputSearch);
 
   if (inputSearch.length === 0) {
-    refs.loadMoreBtn.classList.add('is-hidden');
-    return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
+    onFetchError();
   }
   refs.searchBtn.disabled = false;
-  // apiRings(inputSearch)
-  //   .then(data => {
-  //     refs.container.insertAdjacentHTML('beforeend', markup(data.hits));
-  //   })
-  //   .catch(onFetchError);
-  // refs.loadMoreBtn.classList.remove('is-hidden');
 }
 
-function onClickSearch() {
-  refs.loadMoreBtn.classList.add('is-hidden');
-}
-
-function onSubmitSearch(event) {
+async function onSubmitSearch(event) {
   event.preventDefault();
-  apiRings(inputSearch)
-    .then(response => {
+  try {
+    const response = await apiRings(inputSearch);
+    
+    
+    if (response.totalHits >= 1) {
       refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
       Notify.success(`Hooray! We found ${response.total}`);
-    })
-    .catch(onFetchError);
-  refs.loadMoreBtn.classList.remove('is-hidden');
+      refs.loadMoreBtn.classList.remove('is-hidden');
+    } else if (response.data.hits === []) {
+      onFetchError();
+    }
+  } catch (error) {
+    onFetchError();
+  }
+  lightbox.refresh();
 }
 
 function onLoadMore() {
   page += 1;
-  paramSearch = inputSearch;
-  
-  apiRings(paramSearch, page)
+
+  apiRings(inputSearch, page)
     .then(response => {
       if (response.total === response.totalHits) {
         refs.loadMoreBtn.classList.add('is-hidden');
+        refs.searchBtn.disabled = true;
         return Notify.success(
           "We're sorry, but you've reached the end of search results."
         );
       }
-      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
+      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));      
       Notify.success(`Hooray! We found ${response.total}`);
+      lightbox.refresh();
     })
-    .catch(onFetchError);
+    .catch(onFetchError);  
+}
+
+function onClickSearch() {
+  refs.loadMoreBtn.classList.add('is-hidden');
 }
 
 function clearMarkup() {
@@ -87,7 +94,8 @@ function clearMarkup() {
 }
 
 function onFetchError(error) {
-  Notify.failure(
+  refs.loadMoreBtn.classList.add('is-hidden');
+  return Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
 }
