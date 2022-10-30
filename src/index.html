@@ -14,12 +14,16 @@
         autocomplete="off"
         placeholder="Search images..."
       />
-      <button type="submit">Search</button>
+      <button type="submit" class="search-btn">
+        <svg width="15" height="15">
+          <use  href="./img/search_icon.svg#icon-search"></use>
+        </svg>
+      </button>
     </form>
     <div class="gallery">
       <!-- Карточки изображений -->
     </div>
-    <button type="button" class="load-more">Load more</button>
+    <button type="button" class="load-more is-hidden">Load more</button>
     <script src="index.js" type="module"></script>
   </body>
 </html>
