@@ -6,8 +6,8 @@ const API_KEY = '30883328-4550d73a5a5d91ad50d778095';
 //   },
 // };
 
-export function apiRings(name, page = 1) {
-  const url = `${BASE_URL}?key=${API_KEY}&q=${name}&page=${page}&image_type=photo&orientation=horizontal&safesearch=true&lim&page=1&per_page=40`;
+export function apiRings(inputSearch, page) {
+  const url = `${BASE_URL}?key=${API_KEY}&q=${inputSearch}&page=${page}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40`;
   return fetch(url).then(response => {
     if (!response.ok) {
       throw new Error(response.status);
@@ -16,3 +16,12 @@ export function apiRings(name, page = 1) {
     return response.json();
   });
 }
+
+// export async function apiRings(inputSearch, page = 1) {
+//   const url = `${BASE_URL}?key=${API_KEY}&q=${inputSearch}&page=${page}&image_type=photo&orientation=horizontal&safesearch=true&page=1&per_page=40`;
+//   const responce = await axios.get(
+//     `${BASE_URL}?key=${API_KEY}&q=${inputSearch}&page=${page}&image_type=photo&orientation=horizontal&safesearch=true&page=1&per_page=40`
+//   );
+//   console.log(responce.hits);
+//   return responce.hits;
+//   }
