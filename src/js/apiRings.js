@@ -12,8 +12,6 @@ export async function apiRings(inputSearch, page = 1) {
     //   // Authorization: '${API_KEY}',
     // },
     params: {
-      // q: 'inputSearch',
-      // page: 'page',
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: 'true',
