@@ -54,6 +54,7 @@ async function onSubmitSearch(event) {
     
     
     if (response.totalHits >= 1) {
+      console.log(response)
       refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
       Notify.success(`Hooray! We found ${response.total}`);
       refs.loadMoreBtn.classList.remove('is-hidden');
