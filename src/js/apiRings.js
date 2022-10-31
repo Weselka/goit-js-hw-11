@@ -7,10 +7,10 @@ export async function apiRings(inputSearch, page = 1) {
   const axios = require('axios').default;
   const url = `${BASE_URL}?key=${API_KEY}&q=${inputSearch}&page=${page}`;
   const response = await axios.get(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      // Authorization: '${API_KEY}',
-    },
+    // headers: {
+    //   'Content-Type': 'application/json',
+    //   // Authorization: '${API_KEY}',
+    // },
     params: {
       // q: 'inputSearch',
       // page: 'page',
