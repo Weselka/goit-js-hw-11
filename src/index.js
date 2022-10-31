@@ -78,9 +78,9 @@ function onLoadMore() {
           "We're sorry, but you've reached the end of search results."
         );
       }
-      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));      
-      Notify.success(`Hooray! We found ${response.total}`);
+      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
       lightbox.refresh();
+      Notify.success(`Hooray! We found ${response.total}`);
     })
     .catch(onFetchError);  
 }
