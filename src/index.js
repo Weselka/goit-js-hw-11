@@ -16,8 +16,8 @@ const refs = {
 };
 
 const lightbox = new SimpleLightbox('.gallery a', {
-  // captionsData: 'alt',
-  // captionDelay: 250,
+  captionsData: 'alt',
+  captionDelay: 250,
 });
 
 let page = 1;
@@ -52,25 +52,23 @@ async function onSubmitSearch(event) {
   if (inputSearch === '' && inputSearch < 1) {
     return;
   }
-    try {
-      const response = await apiRings(inputSearch);
+  try {
+    const response = await apiRings(inputSearch);
 
-      if (response.totalHits >= 1) {
-        console.log(response);
-        refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
-        lightbox.refresh();
-        Notify.success(`Hooray! We found ${response.total}`);
-        refs.loadMoreBtn.classList.remove('is-hidden');
-        if (response.totalHits <= 40) {
-          refs.loadMoreBtn.classList.add('is-hidden');
-        }
-      } else if (response.data.hits === []) {
-        onFetchError();
+    if (response.totalHits >= 1) {
+      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
+      lightbox.refresh();
+      Notify.success(`Hooray! We found ${response.total}`);
+      refs.loadMoreBtn.classList.remove('is-hidden');
+      if (response.totalHits <= 40) {
+        refs.loadMoreBtn.classList.add('is-hidden');
       }
-    } catch (error) {
+    } else if (response.data.hits === []) {
       onFetchError();
     }
-  // lightbox.refresh();
+  } catch (error) {
+    onFetchError();
+  }
 }
 
 function onLoadMore() {
@@ -81,6 +79,9 @@ function onLoadMore() {
       if (response.total === response.totalHits) {
         refs.loadMoreBtn.classList.add('is-hidden');
         refs.searchBtn.disabled = true;
+        refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
+        lightbox.refresh();
+        Notify.success(`Hooray! We found ${response.total}`);
         return Notify.success(
           "We're sorry, but you've reached the end of search results."
         );
@@ -89,7 +90,7 @@ function onLoadMore() {
       lightbox.refresh();
       Notify.success(`Hooray! We found ${response.total}`);
     })
-    .catch(onFetchError);  
+    .catch(onFetchError);
 }
 
 function onClickSearch() {
