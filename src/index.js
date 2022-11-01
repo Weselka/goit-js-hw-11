@@ -38,7 +38,7 @@ function onInputSearch(event) {
   event.preventDefault();
   clearMarkup();
 
-  inputSearch = event.target.value;
+  inputSearch = event.target.value.trim();
   console.log(inputSearch);
 
   if (inputSearch.length === 0) {
@@ -49,21 +49,26 @@ function onInputSearch(event) {
 
 async function onSubmitSearch(event) {
   event.preventDefault();
-  try {
-    const response = await apiRings(inputSearch);
-    
-    
-    if (response.totalHits >= 1) {
-      console.log(response)
-      refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
-      Notify.success(`Hooray! We found ${response.total}`);
-      refs.loadMoreBtn.classList.remove('is-hidden');
-    } else if (response.data.hits === []) {
+  if (inputSearch === '' && inputSearch < 1) {
+    return;
+  }
+    try {
+      const response = await apiRings(inputSearch);
+
+      if (response.totalHits >= 1) {
+        console.log(response);
+        refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
+        Notify.success(`Hooray! We found ${response.total}`);
+        refs.loadMoreBtn.classList.remove('is-hidden');
+        if (response.totalHits <= 40) {
+          refs.loadMoreBtn.classList.add('is-hidden');
+        }
+      } else if (response.data.hits === []) {
+        onFetchError();
+      }
+    } catch (error) {
       onFetchError();
     }
-  } catch (error) {
-    onFetchError();
-  }
   lightbox.refresh();
 }
 
