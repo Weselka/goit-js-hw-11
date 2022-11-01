@@ -16,8 +16,8 @@ const refs = {
 };
 
 const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
+  // captionsData: 'alt',
+  // captionDelay: 250,
 });
 
 let page = 1;
@@ -58,6 +58,7 @@ async function onSubmitSearch(event) {
       if (response.totalHits >= 1) {
         console.log(response);
         refs.container.insertAdjacentHTML('beforeend', markup(response.hits));
+        lightbox.refresh();
         Notify.success(`Hooray! We found ${response.total}`);
         refs.loadMoreBtn.classList.remove('is-hidden');
         if (response.totalHits <= 40) {
@@ -69,7 +70,7 @@ async function onSubmitSearch(event) {
     } catch (error) {
       onFetchError();
     }
-  lightbox.refresh();
+  // lightbox.refresh();
 }
 
 function onLoadMore() {
